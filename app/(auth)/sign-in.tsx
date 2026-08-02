@@ -1,6 +1,7 @@
 import { useAuth, useSignIn } from "@clerk/expo";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import Ionicons from "react-native-vector-icons/Ionicons";
 import {
   ActivityIndicator,
   Image,
@@ -9,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   View,
+  Pressable,
   Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -44,14 +46,17 @@ export default function SignInScreen() {
       });
     } else if (signIn.status === "needs_second_factor") {
       await signIn.mfa.sendPhoneCode();
+      await signIn.mfa.sendPhoneCode();
     } else if (signIn.status === "needs_client_trust") {
       const emailCodeFactor = signIn.supportedSecondFactors.find(
         (factor) => factor.strategy === "email_code",
+      );
       );
       if (emailCodeFactor) {
         await signIn.mfa.sendEmailCode();
       }
     } else {
+      console.log("Sign-in attempt not complete", signIn);
       console.log("Sign-in attempt not complete", signIn);
     }
   };
@@ -63,6 +68,7 @@ export default function SignInScreen() {
 
     if (signIn.status === "complete") {
       await signIn.finalize({
+        navigate: ({ session, decorateUrl }) => {
         navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
             console.log(session?.currentTask);
@@ -81,7 +87,18 @@ export default function SignInScreen() {
 
   // OTP verification screen
   if (signIn.status === "needs_client_trust") {
+  if (signIn.status === "needs_client_trust") {
     return (
+      <SafeAreaView className="flex-1 bg-white">
+        <View className="flex-1 bg-white">
+          {/* Hero Image */}
+          <Image
+            source={require("../../assets/images/hero.png")}
+            className="w-full"
+            resizeMode="cover"
+          />
+        </View>
+      </SafeAreaView>
       <SafeAreaView className="flex-1 bg-white">
         <View className="flex-1 bg-white">
           {/* Hero Image */}
@@ -338,3 +355,4 @@ export default function SignInScreen() {
     </View>
   );
 }
+
