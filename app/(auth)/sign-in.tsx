@@ -1,23 +1,21 @@
-import { useAuth, useSignIn } from "@clerk/expo";
-import { Link, useRouter } from "expo-router";
+import { useSignIn } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import {
   ActivityIndicator,
   Image,
-  Text,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  Text,
+  TextInput,
   View,
-  Pressable,
-  Pressable,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignInScreen() {
-  const { signIn, errors, fetchStatus } = useSignIn();
+  const { signIn, fetchStatus } = useSignIn();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -46,17 +44,14 @@ export default function SignInScreen() {
       });
     } else if (signIn.status === "needs_second_factor") {
       await signIn.mfa.sendPhoneCode();
-      await signIn.mfa.sendPhoneCode();
     } else if (signIn.status === "needs_client_trust") {
       const emailCodeFactor = signIn.supportedSecondFactors.find(
         (factor) => factor.strategy === "email_code",
-      );
       );
       if (emailCodeFactor) {
         await signIn.mfa.sendEmailCode();
       }
     } else {
-      console.log("Sign-in attempt not complete", signIn);
       console.log("Sign-in attempt not complete", signIn);
     }
   };
@@ -69,7 +64,6 @@ export default function SignInScreen() {
     if (signIn.status === "complete") {
       await signIn.finalize({
         navigate: ({ session, decorateUrl }) => {
-        navigate: ({ session, decorateUrl }) => {
           if (session?.currentTask) {
             console.log(session?.currentTask);
             return;
@@ -79,26 +73,15 @@ export default function SignInScreen() {
         },
       });
     } else {
-      console.error("Sign-up attempt not complete:", signUp);
+      console.error("Sign-in attempt not complete:", signIn);
     }
   };
 
   const isLoading = fetchStatus === "fetching";
 
-  // OTP verification screen
-  if (signIn.status === "needs_client_trust") {
+  // OTP verification state
   if (signIn.status === "needs_client_trust") {
     return (
-      <SafeAreaView className="flex-1 bg-white">
-        <View className="flex-1 bg-white">
-          {/* Hero Image */}
-          <Image
-            source={require("../../assets/images/hero.png")}
-            className="w-full"
-            resizeMode="cover"
-          />
-        </View>
-      </SafeAreaView>
       <SafeAreaView className="flex-1 bg-white">
         <View className="flex-1 bg-white">
           {/* Hero Image */}
@@ -112,7 +95,7 @@ export default function SignInScreen() {
     );
   }
 
-  // Sign up form
+  // Sign in form
   return (
     <View className="flex-1 bg-white">
       {/* Hero Section */}
@@ -154,7 +137,7 @@ export default function SignInScreen() {
             </Text>
           </View>
 
-          {/* ---------------- Login Form ---------------- */}
+          {/* Login form */}
 
           <View className="mt-8">
             {/* Email */}
@@ -238,9 +221,7 @@ export default function SignInScreen() {
               </Pressable>
             </View>
 
-            {/* ---------------------------------------------------------------- */}
-            {/* Primary CTA */}
-            {/* ---------------------------------------------------------------- */}
+            {/* Primary action */}
             <Pressable
               onPress={onSignInPress}
               disabled={isLoading}
@@ -277,9 +258,7 @@ export default function SignInScreen() {
               )}
             </Pressable>
 
-            {/* ---------------------------------------------------------------- */}
             {/* Divider */}
-            {/* ---------------------------------------------------------------- */}
             <View className="mt-6 flex-row items-center">
               <View className="h-[1px] flex-1 bg-[#E5E7EB]" />
 
@@ -293,9 +272,7 @@ export default function SignInScreen() {
               <View className="h-[1px] flex-1 bg-[#E5E7EB]" />
             </View>
 
-            {/* ---------------------------------------------------------------- */}
-            {/* Google Login */}
-            {/* ---------------------------------------------------------------- */}
+            {/* Google sign in */}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Continue with Google"
@@ -325,9 +302,7 @@ export default function SignInScreen() {
               )}
             </Pressable>
 
-            {/* ---------------------------------------------------------------- */}
-            {/* Bottom Text */}
-            {/* ---------------------------------------------------------------- */}
+            {/* Sign up link */}
             <View className="mt-6 flex-row items-center justify-center">
               <Text
                 className="text-[14px] text-[#4B5563]"
@@ -355,4 +330,3 @@ export default function SignInScreen() {
     </View>
   );
 }
-
